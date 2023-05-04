@@ -41,6 +41,9 @@
     <Reference Include="Imazen.WebP, Version=10.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Imazen.WebP.10.0.1\lib\net45\Imazen.WebP.dll</HintPath>
     </Reference>
+    <Reference Include="LibHeifSharp, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\LibHeifSharp.3.0.0\lib\netstandard2.0\LibHeifSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Mulan.ThirdParty.LibWebp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Mulan.ThirdParty.LibWebp.1.0.0\lib\net48\Mulan.ThirdParty.LibWebp.dll</HintPath>
     </Reference>
