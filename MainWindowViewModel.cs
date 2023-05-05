@@ -38,8 +38,9 @@ namespace Converter
         public string FileName { get; set; }
 
         public RelayCommand SaveAsWEBPCommand { get; set; }
-        public RelayCommand SaveAsAVIFCommand { get; set; }
         public RelayCommand SaveAsPNGCommand { get; set; }
+        public RelayCommand SaveAsAVIFCommand { get; set; }
+        public RelayCommand SaveAsHEIFCommand { get; set; }
         public RelayCommand TestCommand { get; set; }
         public RelayCommand ClearCommand { get; set; }
 
@@ -107,8 +108,14 @@ namespace Converter
                 File.WriteAllBytes($"C:/Users/zzz/Desktop/test.avif", b_);
                 AddMessage($"test.avif");
             }));
+            SaveAsHEIFCommand = new RelayCommand(o => Task.Run(() => {
+                var b = GenerateTestImage_8();
+                var b_ = ConvertToHEIFFormat(b, 1024, 1024, 1, Quality, false);
+                File.WriteAllBytes($"C:/Users/zzz/Desktop/test.heif", b_);
+                AddMessage($"test.heif");
+            }));
             TestCommand = new RelayCommand(o => Task.Run(() => {
-                var b_ = ConvertToPngFormat(HEIFRead("C:/Users/zzz/Desktop/test.avif"), 1024, 1024, 1);
+                var b_ = ConvertToPngFormat(HEIFRead("C:/Users/zzz/Desktop/test.heif"), 1024, 1024, 1);
                 File.WriteAllBytes($"C:/Users/zzz/Desktop/test_c.png", b_);
                 AddMessage($"test_c.png");
             }));
@@ -174,11 +181,11 @@ namespace Converter
         }
 
         // save as 8-bits-greyscale image no matter bytesPerPixel
-        public static byte[] ConvertToHEIFFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95)
+        public static byte[] ConvertToHEIFFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95, bool isAVIF = true)
         {
             using (HeifContext context = new HeifContext())
             {
-                HeifCompressionFormat format = HeifCompressionFormat.Av1;
+                HeifCompressionFormat format = isAVIF ? HeifCompressionFormat.Av1 : HeifCompressionFormat.Hevc;
                 var encoderDescriptors = context.GetEncoderDescriptors(format);
                 HeifEncoderDescriptor encoderDescriptor = encoderDescriptors[0];
 
@@ -233,9 +240,7 @@ namespace Converter
         {
             using (HeifContext context = new HeifContext(fileName))
             {
-                var topLevelImageIds = context.GetTopLevelImageIds();
-
-                using (HeifImageHandle imageHandle = context.GetImageHandle(topLevelImageIds[0]))
+                using (HeifImageHandle imageHandle = context.GetPrimaryImageHandle())
                 {
                     using (var image = imageHandle.Decode(HeifColorspace.Rgb, HeifChroma.InterleavedRgb24))
                     {
