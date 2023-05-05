@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using LibHeifSharp;
-using System.Windows.Markup;
 
 namespace Converter
 {
@@ -92,7 +91,7 @@ namespace Converter
 
             SaveAsWEBPCommand = new RelayCommand(o => Task.Run(() => {
                 var b = GenerateTestImage_8();
-                var b_ = ConvertToWebpFormat(b, 1024, 1024, 1, 95);
+                var b_ = ConvertToWebpFormat(b, 1024, 1024, 1, Quality);
                 File.WriteAllBytes("C:/Users/zzz/Desktop/test.webp", b_);
                 AddMessage("test.webp");
             }));
@@ -103,8 +102,15 @@ namespace Converter
                 AddMessage("test.png");
             }));
             SaveAsAVIFCommand = new RelayCommand(o => Task.Run(() => {
-                ConvertToHEIFFormat();
-                AddMessage("test.avif");
+                var b = GenerateTestImage_8();
+                var b_ = ConvertToHEIFFormat(b, 1024, 1024, 1, Quality);
+                File.WriteAllBytes($"C:/Users/zzz/Desktop/test.avif", b_);
+                AddMessage($"test.avif");
+            }));
+            TestCommand = new RelayCommand(o => Task.Run(() => {
+                var b_ = ConvertToPngFormat(HEIFRead("C:/Users/zzz/Desktop/test.avif"), 1024, 1024, 1);
+                File.WriteAllBytes($"C:/Users/zzz/Desktop/test_c.png", b_);
+                AddMessage($"test_c.png");
             }));
             ClearCommand = new RelayCommand(o => LogItems.Clear());
         }
@@ -167,39 +173,27 @@ namespace Converter
             }
         }
 
-        public void ConvertToHEIFFormat()
+        public static byte[] ConvertToHEIFFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95)
         {
-            int Width = 1024;
-            int Height = 1024;
-            int bytesPerPixel = 1;
-            int quality = 101;
-            string tag = quality > 100 ? "lossless" : $"{quality}";
-            string outputPath = $"C:/Users/zzz/Desktop/arb{tag}.avif";
-
-            var bytes = GenerateTestImage_8();
-
             using (HeifContext context = new HeifContext())
             {
-                HeifEncoderDescriptor encoderDescriptor = null;
                 HeifCompressionFormat format = HeifCompressionFormat.Av1;
                 var encoderDescriptors = context.GetEncoderDescriptors(format);
-                encoderDescriptor = encoderDescriptors[0];
+                HeifEncoderDescriptor encoderDescriptor = encoderDescriptors[0];
 
                 using (HeifEncoder encoder = context.GetEncoder(encoderDescriptor))
                 {
-                    var colorspace = HeifColorspace.Monochrome;
-                    var chroma = HeifChroma.Monochrome;
-                    HeifImage heifImage = new HeifImage(Width, Height, colorspace, chroma);
+                    HeifImage heifImage = new HeifImage(imageWidth, imageHeight, HeifColorspace.Monochrome, HeifChroma.Monochrome);
 
-                    heifImage.AddPlane(HeifChannel.Y, Width, Height, 8);
+                    heifImage.AddPlane(HeifChannel.Y, imageWidth, imageHeight, 8);
                     var grayPlane = heifImage.GetPlane(HeifChannel.Y);
                     int grayPlaneStride = grayPlane.Stride;
-                    System.Runtime.InteropServices.Marshal.Copy(bytes, 0, grayPlane.Scan0, Width * Height * bytesPerPixel);
+                    System.Runtime.InteropServices.Marshal.Copy(bytes, 0, grayPlane.Scan0, imageWidth * imageHeight);
 
                     if (0 < quality && quality <= 100)
                     {
                         heifImage.NclxColorProfile = new HeifNclxColorProfile(
-                            ColorPrimaries.BT709,
+                            ColorPrimaries.BT709,   
                             TransferCharacteristics.Srgb,
                             MatrixCoefficients.BT601,
                             fullRange: true);
@@ -215,16 +209,42 @@ namespace Converter
                         encoder.SetLossless(true);
                     }
 
-                    var encodingOptions = new HeifEncodingOptions
-                    {
-                        SaveAlphaChannel = false,
-                        WriteTwoColorProfiles = false
-                    };
+                    var encodingOptions = new HeifEncodingOptions { SaveAlphaChannel = false };
 
                     context.EncodeImage(heifImage, encoder, encodingOptions);
 
-                    context.WriteToFile(outputPath);
+                    using (var stream = new MemoryStream())
+                    {
+                        context.WriteToStream(stream);
+                        return stream.ToArray();
+                    }
                 }       
+            }
+        }
+
+        public static byte[] HEIFRead(string fileName)
+        {
+            using (HeifContext context = new HeifContext(fileName))
+            {
+                var topLevelImageIds = context.GetTopLevelImageIds();
+
+                using (HeifImageHandle imageHandle = context.GetImageHandle(topLevelImageIds[0]))
+                {
+                    using (var image = imageHandle.Decode(HeifColorspace.Rgb, HeifChroma.InterleavedRgb24))
+                    {
+                        int size = image.Width * image.Height;
+                        byte[] bufferRGB = new byte[size * 3];
+                        byte[] buffer = new byte[size];
+
+                        HeifPlaneData heifPlaneData = image.GetPlane(HeifChannel.Interleaved);
+                        System.Runtime.InteropServices.Marshal.Copy(heifPlaneData.Scan0, bufferRGB, 0, size * 3);
+                        for (int i = 0; i < size; i++)
+                        {
+                            buffer[i] = bufferRGB[i * 3 + 1];
+                        }
+                        return buffer;
+                    }
+                }
             }
         }
     }

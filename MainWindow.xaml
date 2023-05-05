@@ -62,7 +62,7 @@
 
             <TextBlock Grid.Column="0"
                        Grid.Row="0"
-                       Text="webp Quality"
+                       Text="Quality"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"/>
             <TextBox Grid.Column="1" 
