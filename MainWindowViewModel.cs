@@ -132,7 +132,7 @@ namespace Converter
                 {
                     for (int j = 0; j < imageHeight; j++)
                     {
-                        buffer_bitmap[(i * imageWidth + j) * 3] = bytes[(i * imageWidth + j + 1) * bytesPerPixel - 1];
+                        buffer_bitmap[(i * imageWidth + j) * 3]     = bytes[(i * imageWidth + j + 1) * bytesPerPixel - 1];
                         buffer_bitmap[(i * imageWidth + j) * 3 + 1] = bytes[(i * imageWidth + j + 1) * bytesPerPixel - 1];
                         buffer_bitmap[(i * imageWidth + j) * 3 + 2] = bytes[(i * imageWidth + j + 1) * bytesPerPixel - 1];
                     }
@@ -173,6 +173,7 @@ namespace Converter
             }
         }
 
+        // save as 8-bits-greyscale image no matter bytesPerPixel
         public static byte[] ConvertToHEIFFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95)
         {
             using (HeifContext context = new HeifContext())
@@ -188,26 +189,32 @@ namespace Converter
                     heifImage.AddPlane(HeifChannel.Y, imageWidth, imageHeight, 8);
                     var grayPlane = heifImage.GetPlane(HeifChannel.Y);
                     int grayPlaneStride = grayPlane.Stride;
-                    System.Runtime.InteropServices.Marshal.Copy(bytes, 0, grayPlane.Scan0, imageWidth * imageHeight);
 
-                    if (0 < quality && quality <= 100)
+                    if (bytesPerPixel == 1)
                     {
-                        heifImage.NclxColorProfile = new HeifNclxColorProfile(
-                            ColorPrimaries.BT709,   
+                        System.Runtime.InteropServices.Marshal.Copy(bytes, 0, grayPlane.Scan0, imageWidth * imageHeight);
+                    }
+                    else if (bytesPerPixel == 2)
+                    {
+                        int size = imageWidth * imageHeight;
+                        var buffer = new byte[size];
+                        for (int i = 0; i < size; i++)
+                        {
+                            buffer[i] = bytes[i * 2 + 1];
+                        }
+                        System.Runtime.InteropServices.Marshal.Copy(buffer, 0, grayPlane.Scan0, imageWidth * imageHeight);
+                    }
+
+                    heifImage.NclxColorProfile = new HeifNclxColorProfile(
+                            ColorPrimaries.BT709,
                             TransferCharacteristics.Srgb,
                             MatrixCoefficients.BT601,
                             fullRange: true);
+
+                    if (0 < quality && quality <= 100)
                         encoder.SetLossyQuality(quality);
-                    }
                     else
-                    {
-                        heifImage.NclxColorProfile = new HeifNclxColorProfile(
-                            ColorPrimaries.BT709,
-                            TransferCharacteristics.Srgb,
-                            MatrixCoefficients.Identity,
-                            fullRange: true);
                         encoder.SetLossless(true);
-                    }
 
                     var encodingOptions = new HeifEncodingOptions { SaveAlphaChannel = false };
 
@@ -240,7 +247,7 @@ namespace Converter
                         System.Runtime.InteropServices.Marshal.Copy(heifPlaneData.Scan0, bufferRGB, 0, size * 3);
                         for (int i = 0; i < size; i++)
                         {
-                            buffer[i] = bufferRGB[i * 3 + 1];
+                                buffer[i] = bufferRGB[i * 3];
                         }
                         return buffer;
                     }
