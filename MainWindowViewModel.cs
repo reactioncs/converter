@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using LibHeifSharp;
+using System.Drawing;
 
 namespace Converter
 {
@@ -44,12 +45,15 @@ namespace Converter
         public RelayCommand TestCommand { get; set; }
         public RelayCommand ClearCommand { get; set; }
 
-        public void AddMessage(string message)
+        public DateTime AddMessage(string message)
         {
+            LogItem log = new LogItem() { Message = message };
+
             System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                LogItems.Add(new LogItem() { Message = message });
+                LogItems.Add(log);
             }));
+            return log.Time;
         }
 
         private static byte[] GenerateTestImage_16()
@@ -84,6 +88,54 @@ namespace Converter
             return buffer;
         }
 
+        private ImageBuffer GetPng(string path)
+        {
+            ImageBuffer imageBuffer = new ImageBuffer();
+
+            FileStream fs = File.OpenRead(path);
+            var img = (Bitmap)Image.FromStream(fs);
+
+            imageBuffer.Width = img.Width;
+            imageBuffer.Height = img.Height;
+            byte[] buffer = new byte[imageBuffer.Width * imageBuffer.Height];
+
+            for (int i = 0; i < imageBuffer.Height; i++)
+            {
+                for (int j = 0; j < imageBuffer.Height; j++)
+                {
+                    var c = img.GetPixel(i, j);
+                    buffer[i * imageBuffer.Width + j] = c.R;
+                }
+            }
+            imageBuffer.Bytes = buffer;
+            return imageBuffer;
+        }
+
+        private void BulkConvert(string path)
+        {
+            var img = GetPng(path);
+
+            string postfix = Quality > 100 ? "lossless" : $"{Quality}";
+            string path0 = path.Replace(".png", $"_{postfix}.webp");
+            string path1 = path.Replace(".png", $"_{postfix}.avif");
+            string path2 = path.Replace(".png", $"_{postfix}.heif");
+
+            var b0 = ConvertToWebpFormat(img.Bytes, img.Width, img.Height, 1, Quality);
+            File.WriteAllBytes(path0, b0);
+            int b0_size = b0.Length / 1024; 
+            AddMessage($"{b0_size}KB   {path0}");
+
+            var b1 = ConvertToAvifFormat(img.Bytes, img.Width, img.Height, 1, Quality);
+            File.WriteAllBytes(path1, b1);
+            int b1_size = b1.Length / 1024; 
+            AddMessage($"{b1_size}KB   {path1}");
+
+            var b2 = ConvertToHeifFormat(img.Bytes, img.Width, img.Height, 1, Quality);
+            File.WriteAllBytes(path2, b2);
+            int b2_size = b2.Length / 1024; 
+            AddMessage($"{b2_size}KB   {path2}");
+        }
+
         public MainWindowViewModel()
         {
             FilePath = "C:/Users/zzz/Desktop";
@@ -91,33 +143,21 @@ namespace Converter
             LogItems = new ObservableCollection<LogItem>();
 
             SaveAsWEBPCommand = new RelayCommand(o => Task.Run(() => {
-                var b = GenerateTestImage_8();
-                var b_ = ConvertToWebpFormat(b, 1024, 1024, 1, Quality);
-                File.WriteAllBytes("C:/Users/zzz/Desktop/test.webp", b_);
-                AddMessage("test.webp");
+                //var b = GenerateTestImage_8();
+                //var b_ = ConvertToWebpFormat(b, 1024, 1024, 1, Quality);
+                //File.WriteAllBytes("C:/Users/zzz/Desktop/test.webp", b_);
+                //AddMessage("test.webp");
             }));
             SaveAsPNGCommand = new RelayCommand(o => Task.Run(() => {
-                var b = GenerateTestImage_8();
-                var b_ = ConvertToPngFormat(b, 1024, 1024, 1);
-                File.WriteAllBytes("C:/Users/zzz/Desktop/test.png", b_);
-                AddMessage("test.png");
             }));
             SaveAsAVIFCommand = new RelayCommand(o => Task.Run(() => {
-                var b = GenerateTestImage_8();
-                var b_ = ConvertToHEIFFormat(b, 1024, 1024, 1, Quality);
-                File.WriteAllBytes($"C:/Users/zzz/Desktop/test.avif", b_);
-                AddMessage($"test.avif");
             }));
             SaveAsHEIFCommand = new RelayCommand(o => Task.Run(() => {
-                var b = GenerateTestImage_8();
-                var b_ = ConvertToHEIFFormat(b, 1024, 1024, 1, Quality, false);
-                File.WriteAllBytes($"C:/Users/zzz/Desktop/test.heif", b_);
-                AddMessage($"test.heif");
             }));
-            TestCommand = new RelayCommand(o => Task.Run(() => {
-                var b_ = ConvertToPngFormat(HEIFRead("C:/Users/zzz/Desktop/test.heif"), 1024, 1024, 1);
-                File.WriteAllBytes($"C:/Users/zzz/Desktop/test_c.png", b_);
-                AddMessage($"test_c.png");
+            TestCommand = new RelayCommand(o => Task.Run(() =>
+            {
+                BulkConvert("C:/Users/zzz/Desktop/tt/IA.png");
+                BulkConvert("C:/Users/zzz/Desktop/tt/IB.png");
             }));
             ClearCommand = new RelayCommand(o => LogItems.Clear());
         }
@@ -180,14 +220,18 @@ namespace Converter
             }
         }
 
-        // save as 8-bits-greyscale image no matter bytesPerPixel
-        public static byte[] ConvertToHEIFFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95, bool isAVIF = true)
+        public static byte[] ConvertToHeifFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95)
+        {
+            return ConvertToAvifFormat(bytes, imageWidth, imageHeight, bytesPerPixel, quality, false);
+        }
+
+        public static byte[] ConvertToAvifFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95, bool isAVIF = true)
         {
             using (HeifContext context = new HeifContext())
             {
-                HeifCompressionFormat format = isAVIF ? HeifCompressionFormat.Av1 : HeifCompressionFormat.Hevc;
+                var format = isAVIF ? HeifCompressionFormat.Av1 : HeifCompressionFormat.Hevc;
                 var encoderDescriptors = context.GetEncoderDescriptors(format);
-                HeifEncoderDescriptor encoderDescriptor = encoderDescriptors[0];
+                var encoderDescriptor = encoderDescriptors[0];
 
                 using (HeifEncoder encoder = context.GetEncoder(encoderDescriptor))
                 {
@@ -232,7 +276,7 @@ namespace Converter
                         context.WriteToStream(stream);
                         return stream.ToArray();
                     }
-                }       
+                }
             }
         }
 
@@ -252,12 +296,19 @@ namespace Converter
                         System.Runtime.InteropServices.Marshal.Copy(heifPlaneData.Scan0, bufferRGB, 0, size * 3);
                         for (int i = 0; i < size; i++)
                         {
-                                buffer[i] = bufferRGB[i * 3];
+                            buffer[i] = bufferRGB[i * 3];
                         }
                         return buffer;
                     }
                 }
             }
+        }
+
+        public struct ImageBuffer
+        {
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public byte[] Bytes { get; set; }
         }
     }
 }
