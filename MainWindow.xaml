@@ -34,6 +34,7 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Time" Width="110" DisplayMemberBinding="{Binding Time, StringFormat='HH:mm:ss.fff'}"/>
+                    <GridViewColumn Header="Span" Width="50" DisplayMemberBinding="{Binding Span}"/>
                     <GridViewColumn Header="Message" Width="300" DisplayMemberBinding="{Binding Message}"/>
                 </GridView>
             </ListView.View>

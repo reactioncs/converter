@@ -45,9 +45,12 @@ namespace Converter
         public RelayCommand TestCommand { get; set; }
         public RelayCommand ClearCommand { get; set; }
 
-        public DateTime AddMessage(string message)
+        public DateTime AddMessage(string message, DateTime? timePrevious = null)
         {
-            LogItem log = new LogItem() { Message = message };
+            LogItem log = new LogItem() {
+                Message = message,
+                TimePrevious = timePrevious ?? DateTime.Now
+            };
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
@@ -120,20 +123,23 @@ namespace Converter
             string path1 = path.Replace(".png", $"_{postfix}.avif");
             string path2 = path.Replace(".png", $"_{postfix}.heif");
 
+            var t = DateTime.Now;
             var b0 = ConvertToWebpFormat(img.Bytes, img.Width, img.Height, 1, Quality);
             File.WriteAllBytes(path0, b0);
             int b0_size = b0.Length / 1024; 
-            AddMessage($"{b0_size}KB   {path0}");
+            AddMessage($"{b0_size}KB   {path0}", t);
 
+            t = DateTime.Now;
             var b1 = ConvertToAvifFormat(img.Bytes, img.Width, img.Height, 1, Quality);
             File.WriteAllBytes(path1, b1);
             int b1_size = b1.Length / 1024; 
-            AddMessage($"{b1_size}KB   {path1}");
+            AddMessage($"{b1_size}KB   {path1}", t);
 
+            t = DateTime.Now;
             var b2 = ConvertToHeifFormat(img.Bytes, img.Width, img.Height, 1, Quality);
             File.WriteAllBytes(path2, b2);
             int b2_size = b2.Length / 1024; 
-            AddMessage($"{b2_size}KB   {path2}");
+            AddMessage($"{b2_size}KB   {path2}", t);
         }
 
         public MainWindowViewModel()
