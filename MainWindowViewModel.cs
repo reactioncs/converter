@@ -14,7 +14,7 @@ namespace Converter
 {
     internal class MainWindowViewModel : ObservableObject
     {
-        private int mQuality = 95;
+        private int mQuality = 101;
         public int Quality
         {
             get { return mQuality; }
@@ -43,6 +43,7 @@ namespace Converter
         public RelayCommand SaveAsAVIFCommand { get; set; }
         public RelayCommand SaveAsHEIFCommand { get; set; }
         public RelayCommand TestCommand { get; set; }
+        public RelayCommand WriteTestCommand { get; set; }
         public RelayCommand ClearCommand { get; set; }
 
         public DateTime AddMessage(string message, DateTime? timePrevious = null)
@@ -91,32 +92,9 @@ namespace Converter
             return buffer;
         }
 
-        private ImageBuffer GetPng(string path)
-        {
-            ImageBuffer imageBuffer = new ImageBuffer();
-
-            FileStream fs = File.OpenRead(path);
-            var img = (Bitmap)Image.FromStream(fs);
-
-            imageBuffer.Width = img.Width;
-            imageBuffer.Height = img.Height;
-            byte[] buffer = new byte[imageBuffer.Width * imageBuffer.Height];
-
-            for (int i = 0; i < imageBuffer.Height; i++)
-            {
-                for (int j = 0; j < imageBuffer.Height; j++)
-                {
-                    var c = img.GetPixel(i, j);
-                    buffer[i * imageBuffer.Width + j] = c.R;
-                }
-            }
-            imageBuffer.Bytes = buffer;
-            return imageBuffer;
-        }
-
         private void BulkConvert(string path)
         {
-            var img = GetPng(path);
+            var img = ReadPngFile(path);
 
             string postfix = Quality > 100 ? "lossless" : $"{Quality}";
             string path0 = path.Replace(".png", $"_{postfix}.webp");
@@ -142,6 +120,29 @@ namespace Converter
             AddMessage($"{b2_size}KB   {path2}", t);
         }
 
+        private void MutiAvifTest(int id)
+        {
+            Random r = new Random();
+            ImageBuffer img = ReadPngFile("C:/Users/Dell/Desktop/test.png");
+
+            for (int i = 0; i < 20; i++)
+            {
+                ImageBuffer img_i = img;
+                int s = r.Next(100000, 500000);
+                for (int j = s; j < s + 5000; j++)
+                {
+                    if (j > img_i.Bytes.Length + 10)
+                        break;
+                    img_i.Bytes[j] = (byte)(r.Next(100, 220));
+                }
+                var b = ConvertToAvifFormat(img.Bytes, img.Width, img.Height, 1, Quality);
+
+                File.WriteAllBytes($"C:/Users/Dell/Desktop/test/{id}_{i}.avif", b);
+                if (i % 10 == 9 || i == 0)
+                    AddMessage($"{img_i.Bytes.Length}B   {id}_{i}.avif");
+            }
+        }
+
         public MainWindowViewModel()
         {
             FilePath = "C:/Users/zzz/Desktop";
@@ -149,10 +150,10 @@ namespace Converter
             LogItems = new ObservableCollection<LogItem>();
 
             SaveAsWEBPCommand = new RelayCommand(o => Task.Run(() => {
-                //var b = GenerateTestImage_8();
-                //var b_ = ConvertToWebpFormat(b, 1024, 1024, 1, Quality);
-                //File.WriteAllBytes("C:/Users/zzz/Desktop/test.webp", b_);
-                //AddMessage("test.webp");
+                var b = GenerateTestImage_8();
+                var b_ = ConvertToWebpFormat(b, 1024, 1024, 1, 101);
+                File.WriteAllBytes("C:/Users/Dell/Desktop/tt/ori.webp", b_);
+                AddMessage("ori.webp");
             }));
             SaveAsPNGCommand = new RelayCommand(o => Task.Run(() => {
             }));
@@ -162,9 +163,15 @@ namespace Converter
             }));
             TestCommand = new RelayCommand(o => Task.Run(() =>
             {
-                BulkConvert("C:/Users/zzz/Desktop/tt/IA.png");
-                BulkConvert("C:/Users/zzz/Desktop/tt/IB.png");
+                var img = ReadWebpFile("C:/Users/Dell/Desktop/tt/ori.webp");
+                var b_ = ConvertToPngFormat(img.Bytes, img.Width, img.Height, 1);
+                File.WriteAllBytes("C:/Users/Dell/Desktop/tt/res.png", b_);
+                AddMessage("res.png");
             }));
+            WriteTestCommand = new RelayCommand(o =>
+            {
+                int c = Environment.ProcessorCount / 5;
+            });
             ClearCommand = new RelayCommand(o => LogItems.Clear());
         }
 
@@ -286,7 +293,7 @@ namespace Converter
             }
         }
 
-        public static byte[] HEIFRead(string fileName)
+        public static byte[] ReadHeifFile(string fileName)
         {
             using (HeifContext context = new HeifContext(fileName))
             {
@@ -307,6 +314,66 @@ namespace Converter
                         return buffer;
                     }
                 }
+            }
+        }
+
+        public ImageBuffer ReadPngFile(string path)
+        {
+            ImageBuffer imageBuffer = new ImageBuffer();
+
+            FileStream fs = File.OpenRead(path);
+            var img = (Bitmap)Image.FromStream(fs);
+
+            imageBuffer.Width = img.Width;
+            imageBuffer.Height = img.Height;
+            byte[] buffer = new byte[imageBuffer.Width * imageBuffer.Height];
+
+            for (int i = 0; i < imageBuffer.Height; i++)
+            {
+                for (int j = 0; j < imageBuffer.Width; j++)
+                {
+                    var c = img.GetPixel(i, j);
+                    buffer[j * imageBuffer.Width + i] = c.R;
+                }
+            }
+            imageBuffer.Bytes = buffer;
+            return imageBuffer;
+        }
+
+        public ImageBuffer ReadWebpFile(string fileName)
+        {
+            ImageBuffer imageBuffer = new ImageBuffer();
+
+            imageBuffer.Bytes = ReadWebpFile(fileName, out int width, out int height, out _);
+            imageBuffer.Width = width;
+            imageBuffer.Height = height;
+
+            return imageBuffer;
+        }
+
+        public static byte[] ReadWebpFile(string fileName, out int width, out int height, out int bytesPerPixel)
+        {
+            using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            using (var memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                var image = new WebP().Decode(memoryStream.ToArray());
+
+                width = image.Width;
+                height = image.Height;
+                bytesPerPixel = 1;
+
+                int size = width * height;
+                byte[] buffer = new byte[size];
+
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        buffer[i * width + j] = image.GetPixel(j, i).R;
+                    }
+                }
+                return buffer;
             }
         }
 

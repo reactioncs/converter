@@ -103,6 +103,11 @@
                     Margin="2"
                     Content="Test" 
                     Command="{Binding TestCommand}"/>
+            <Button Grid.Column="1" 
+                    Grid.Row="9" 
+                    Margin="2"
+                    Content="Write Test" 
+                    Command="{Binding WriteTestCommand}"/>
         </Grid>
     </Grid>
 </Window>
