@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Converter.Model
+namespace ImageConverter.Model
 {
-    internal class LogItem
+    public class LogItem
     {
         public DateTime Time { get; set; }
         public DateTime TimePrevious { get; set; }

@@ -3,5 +3,3 @@
 ## TODO
 
 - Add xcopy, to add `.dll` automaticlly
-
-- convert project from framwork to .NET

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Converter
+namespace ImageConverter
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

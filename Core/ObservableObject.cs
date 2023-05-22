@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Converter.Core
+namespace ImageConverter.Core
 {
     public class ObservableObject : INotifyPropertyChanged
     {

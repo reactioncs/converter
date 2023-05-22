@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Converter.Core
+namespace ImageConverter.Core
 {
     public class RelayCommand : ICommand
     {
