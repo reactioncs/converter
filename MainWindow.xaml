@@ -99,12 +99,12 @@
                     Content="Clear" 
                     Command="{Binding ClearCommand}"/>
             <Button Grid.Column="1" 
-                    Grid.Row="8" 
+                    Grid.Row="9" 
                     Margin="2"
                     Content="Test" 
                     Command="{Binding TestCommand}"/>
             <Button Grid.Column="1" 
-                    Grid.Row="9" 
+                    Grid.Row="10" 
                     Margin="2"
                     Content="Write Test" 
                     Command="{Binding WriteTestCommand}"/>
