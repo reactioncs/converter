@@ -166,6 +166,7 @@ namespace ImageConverter
             {
                 for (int j = 0; j < imageBuffer.Width; j++)
                 {
+                    // GetPixel is very very slow...
                     var c = img.GetPixel(i, j);
                     buffer[j * imageBuffer.Width + i] = c.R;
                 }
@@ -199,13 +200,17 @@ namespace ImageConverter
 
                 int size = width * height;
                 byte[] buffer = new byte[size];
+                byte[] bufferRGB = new byte[size * 3];
+                System.Drawing.Imaging.BitmapData data = image.LockBits(
+                    new Rectangle(Point.Empty, image.Size),
+                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                    image.PixelFormat
+                );
+                System.Runtime.InteropServices.Marshal.Copy(data.Scan0, bufferRGB, 0, size * 3);
 
-                for (int i = 0; i < height; i++)
+                for (int i = 0; i < size; i++)
                 {
-                    for (int j = 0; j < width; j++)
-                    {
-                        buffer[i * width + j] = image.GetPixel(j, i).R;
-                    }
+                    buffer[i] = bufferRGB[i * 3];
                 }
                 return buffer;
             }

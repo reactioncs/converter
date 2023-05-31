@@ -1,4 +1,6 @@
-﻿namespace ImageConverter
+﻿using System;
+
+namespace ImageConverter
 {
     public class ImageGenerator
     {
