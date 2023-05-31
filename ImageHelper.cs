@@ -7,7 +7,7 @@ using ThirdParty.LibWebp;
 
 namespace ImageConverter
 {
-    public class ImageHelper
+    public static class ImageHelper
     {
         public static byte[] ConvertToWebpFormat(byte[] bytes, int imageWidth, int imageHeight, int bytesPerPixel, int quality = 95)
         {
@@ -151,7 +151,7 @@ namespace ImageConverter
             }
         }
 
-        public ImageBuffer ReadPngFile(string path)
+        public static ImageBuffer ReadPngFile(string path)
         {
             ImageBuffer imageBuffer = new ImageBuffer();
 

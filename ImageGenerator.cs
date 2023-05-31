@@ -2,7 +2,7 @@
 
 namespace ImageConverter
 {
-    public class ImageGenerator
+    public static class ImageGenerator
     {
         public static byte[] GenerateTestImage_16()
         {
