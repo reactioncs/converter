@@ -41,10 +41,8 @@ namespace ImageConverter
                 TimePrevious = timePrevious ?? DateTime.Now
             };
 
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                LogItems.Add(log);
-            }));
+            System.Windows.Application.Current.Dispatcher.Invoke(() => LogItems.Add(log));
+
             return log.Time;
         }
 
