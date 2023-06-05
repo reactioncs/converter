@@ -76,38 +76,23 @@
             <Button Grid.Column="1" 
                     Grid.Row="2" 
                     Margin="2"
-                    Content="save .png" 
-                    Command="{Binding SaveAsPNGCommand}"/>
+                    Content="Open Folder" 
+                    Command="{Binding OpenFolderCommand}"/>
             <Button Grid.Column="1" 
                     Grid.Row="3" 
-                    Margin="2"
-                    Content="save .webp" 
-                    Command="{Binding SaveAsWEBPCommand}"/>
-            <Button Grid.Column="1" 
-                    Grid.Row="4" 
-                    Margin="2"
-                    Content="save .avif" 
-                    Command="{Binding SaveAsAVIFCommand}"/>
-            <Button Grid.Column="1" 
-                    Grid.Row="5" 
-                    Margin="2"
-                    Content="save .heif" 
-                    Command="{Binding SaveAsHEIFCommand}"/>
-            <Button Grid.Column="1" 
-                    Grid.Row="7" 
                     Margin="2"
                     Content="Clear" 
                     Command="{Binding ClearCommand}"/>
             <Button Grid.Column="1" 
-                    Grid.Row="9" 
+                    Grid.Row="5" 
                     Margin="2"
-                    Content="Test" 
-                    Command="{Binding TestCommand}"/>
+                    Content="Test0" 
+                    Command="{Binding Test0Command}"/>
             <Button Grid.Column="1" 
-                    Grid.Row="10" 
+                    Grid.Row="6" 
                     Margin="2"
-                    Content="Write Test" 
-                    Command="{Binding WriteTestCommand}"/>
+                    Content="Test1" 
+                    Command="{Binding Test1Command}"/>
         </Grid>
     </Grid>
 </Window>
