@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Microsoft.Win32;
 
 namespace ImageConverter
 {
@@ -50,7 +49,7 @@ namespace ImageConverter
 
             OpenFolderCommand = new RelayCommand(o =>
             {
-                string fileName = DoOpenFileDialog() ?? "null";
+                string fileName = FileOperation.OpenImageFileDialog() ?? "null";
                 AddMessage(fileName);
             });
 
@@ -60,64 +59,17 @@ namespace ImageConverter
         {
         }
 
-        private static string? DoOpenFileDialog(string title = "saving", string initialDirectory = "C:\\")
-        {
-            OpenFileDialog fileDialog = new()
-            {
-                InitialDirectory = initialDirectory,
-                Filter = "Png File|*.png|Wepb File|*.webp|Avif File|*.avif|Heif File|*.heif",
-                Title = title
-            };
-
-            if (fileDialog.ShowDialog() == true)
-                return fileDialog.FileName;
-
-            return null;
-        }
-
-        private static string? DoSaveFileDialog(Format f, string title = "saving", string initialDirectory = "C:\\")
-        {
-            string filter = "";
-            filter += f.HasFlag(Format.Png) ? "Png File|*.png|" : "";
-            filter += f.HasFlag(Format.Wepb) ? "Wepb File|*.webp|" : "";
-            filter += f.HasFlag(Format.Avif) ? "Avif File|*.avif|" : "";
-            filter += f.HasFlag(Format.Heif) ? "Heif File|*.heif|" : "";
-
-            SaveFileDialog fileDialog = new()
-            {
-                InitialDirectory = initialDirectory,
-                // get rid of the last '|'
-                Filter = filter[..^1],
-                Title = title
-            };
-
-            if (fileDialog.ShowDialog() == true)
-                return fileDialog.FileName;
-
-            return null;
-        }
-
         private void SaveGenerateImageAsWebp()
         {
             var b = ImageGenerator.GenerateTestImage_8();
             var b_ = ImageHelper.ConvertToWebpFormat(b, 1024, 1024, 1, 101);
 
-            string? path = DoSaveFileDialog(Format.Wepb, title: "Save GenerateImage As Webp");
+            string? path = FileOperation.SavingImageFileDialog(ImageFormats.Wepb, title: "Save GenerateImage As Webp");
             if (path == null)
                 return;
 
             File.WriteAllBytes(path, b_);
             AddMessage(path);
         }
-    }
-
-    [Flags]
-    public enum Format
-    {
-        None = 0,
-        Png = 1,
-        Wepb = 2,
-        Avif = 4,
-        Heif = 8
     }
 }
