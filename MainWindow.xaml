@@ -30,7 +30,8 @@
         <ListView Grid.Row="1" 
                   ItemsSource="{Binding LogItems}" 
                   Foreground="Black"
-                  Margin="5">
+                  Margin="5"
+                  AutomationProperties.AutomationId="LogGrid">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Time" Width="110" DisplayMemberBinding="{Binding Time, StringFormat='HH:mm:ss.fff'}"/>
@@ -71,28 +72,33 @@
                      Text="{Binding Quality, Mode=TwoWay}"
                      VerticalContentAlignment="Center"
                      HorizontalContentAlignment="Center"
-                     x:Name="quality"/>
+                     x:Name="quality"
+                     AutomationProperties.AutomationId="QualityTextBox"/>
 
             <Button Grid.Column="1" 
                     Grid.Row="2" 
                     Margin="2"
                     Content="Open Folder" 
-                    Command="{Binding OpenFolderCommand}"/>
+                    Command="{Binding OpenFolderCommand}"
+                    AutomationProperties.AutomationId="OpenFolderButton"/>
             <Button Grid.Column="1" 
                     Grid.Row="3" 
                     Margin="2"
                     Content="Clear" 
-                    Command="{Binding ClearCommand}"/>
+                    Command="{Binding ClearCommand}"
+                    AutomationProperties.AutomationId="ClearButton"/>
             <Button Grid.Column="1" 
                     Grid.Row="5" 
                     Margin="2"
                     Content="Test0" 
-                    Command="{Binding Test0Command}"/>
+                    Command="{Binding Test0Command}"
+                    AutomationProperties.AutomationId="Test0Button"/>
             <Button Grid.Column="1" 
                     Grid.Row="6" 
                     Margin="2"
                     Content="Test1" 
-                    Command="{Binding Test1Command}"/>
+                    Command="{Binding Test1Command}"
+                    AutomationProperties.AutomationId="Test1Button"/>
         </Grid>
     </Grid>
 </Window>
