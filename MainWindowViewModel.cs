@@ -1,9 +1,11 @@
 ﻿using ImageConverter.Core;
+using CommunityToolkit.Mvvm;
 using ImageConverter.Model;
 using System;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ImageConverter
 {
@@ -19,6 +21,8 @@ namespace ImageConverter
                 OnPropertyChanged();
             }
         }
+
+        public List<string> ExampleList { get; set; } = new() { "C1", "C2", "C3", "C4" };
 
         public ObservableCollection<LogItem> LogItems { get; set; }
 
