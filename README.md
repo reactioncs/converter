@@ -3,5 +3,3 @@
 ## TODO
 
 - Use CommunityToolkit.Mvvm
-
-- Add xcopy, to add `.dll` automaticlly

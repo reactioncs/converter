@@ -28,4 +28,14 @@
     <ProjectReference Include="..\ThirdParty.LibWebp\ThirdParty.LibWebp.csproj" />
   </ItemGroup>
 
+  <Target Name="CopyDLLs" AfterTargets="Build">
+    <ItemGroup>
+      <MySourceFiles Include="$(SolutionDir)Components\*.dll"/>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(TargetDir)" />
+    
+    <Message Text="Finish copy dlls." Importance="High" />
+  </Target>
+
 </Project>
