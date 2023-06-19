@@ -47,13 +47,11 @@ namespace ImageConverter
             switch (bytesPerPixel)
             {
                 case 1:
+                default:
                     f = PixelFormats.Gray8;
                     break;
                 case 2:
                     f = PixelFormats.Gray16;
-                    break;
-                default:
-                    f = PixelFormats.Gray8;
                     break;
             }
             var bitmap = BitmapSource.Create(imageWidth, imageHeight, 96, 96, f, null, bytes, imageWidth * bytesPerPixel);
@@ -151,28 +149,42 @@ namespace ImageConverter
             }
         }
 
-        public static ImageBuffer ReadPngFile(string path)
+        public static ImageBuffer ReadPngFile(string fileName)
         {
             ImageBuffer imageBuffer = new ImageBuffer();
 
-            FileStream fs = File.OpenRead(path);
-            var img = (Bitmap)Image.FromStream(fs);
+            imageBuffer.Bytes = ReadPngFile(fileName, out int width, out int height, out _);
+            imageBuffer.Width = width;
+            imageBuffer.Height = height;
 
-            imageBuffer.Width = img.Width;
-            imageBuffer.Height = img.Height;
-            byte[] buffer = new byte[imageBuffer.Width * imageBuffer.Height];
-
-            for (int i = 0; i < imageBuffer.Height; i++)
-            {
-                for (int j = 0; j < imageBuffer.Width; j++)
-                {
-                    // GetPixel is very very slow...
-                    var c = img.GetPixel(i, j);
-                    buffer[j * imageBuffer.Width + i] = c.R;
-                }
-            }
-            imageBuffer.Bytes = buffer;
             return imageBuffer;
+        }
+
+        public static byte[] ReadPngFile(string fileName, out int width, out int height, out int bytesPerPixel)
+        {
+            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            using (var image = (Bitmap)Image.FromStream(fs))
+            {
+                width = image.Width;
+                height = image.Height;
+                bytesPerPixel = 1;
+
+                int size = width * height;
+                byte[] buffer = new byte[size];
+                byte[] bufferRGB = new byte[size * 4];
+                System.Drawing.Imaging.BitmapData data = image.LockBits(
+                    new Rectangle(Point.Empty, image.Size),
+                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                    image.PixelFormat
+                );
+                System.Runtime.InteropServices.Marshal.Copy(data.Scan0, bufferRGB, 0, size * 4);
+
+                for (int i = 0; i < size; i++)
+                {
+                    buffer[i] = bufferRGB[i * 4];
+                }
+                return buffer;
+            }
         }
 
         public static ImageBuffer ReadWebpFile(string fileName)

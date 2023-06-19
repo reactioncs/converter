@@ -22,14 +22,15 @@ namespace ImageConverter
             }
         }
 
-        public List<string> ExampleList { get; set; } = new() { "C1", "C2", "C3", "C4" };
+        public List<string> AvailableBytesPerPixel { get; set; } = new() { "8-bits per pixel", "16-bits per pixel" };
 
         public ObservableCollection<LogItem> LogItems { get; set; }
 
         public RelayCommand OpenFolderCommand { get; set; }
+        public RelayCommand ClearCommand { get; set; }
+        public RelayCommand SaveGeneratedImageCommand { get; set; }
         public RelayCommand Test0Command { get; set; }
         public RelayCommand Test1Command { get; set; }
-        public RelayCommand ClearCommand { get; set; }
 
         public DateTime AddMessage(string message, DateTime? timePrevious = null)
         {
@@ -48,8 +49,10 @@ namespace ImageConverter
         {
             LogItems = new ObservableCollection<LogItem>();
 
-            Test0Command = new RelayCommand(o => Task.Run(() => DoTest0()));
-            Test1Command = new RelayCommand(o => Task.Run(() => SaveGenerateImageAsWebp()));
+            Test0Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test0"); }));
+            Test1Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test1"); }));
+
+            SaveGeneratedImageCommand = new RelayCommand(o => Task.Run(() => { SaveGenerateImageAsWebp(); }));
 
             OpenFolderCommand = new RelayCommand(o =>
             {
@@ -58,9 +61,6 @@ namespace ImageConverter
             });
 
             ClearCommand = new RelayCommand(o => LogItems.Clear());
-        }
-        private void DoTest0()
-        {
         }
 
         private void SaveGenerateImageAsWebp()

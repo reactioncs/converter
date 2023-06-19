@@ -80,34 +80,41 @@
                      VerticalContentAlignment="Center"
                      AutomationProperties.AutomationId="QualityTextBox"/>
 
-            <TextBlock Text="Combo Box"
-                       Grid.Row="1" Grid.Column="0"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
-            <ComboBox ItemsSource="{Binding ExampleList}"
-                      SelectedIndex="0"
-                      Grid.Row="1" Grid.Column="1"
-                      AutomationProperties.AutomationId="MyComboBox">
-            </ComboBox>
-
             <Button Content="Open Folder"
                     Command="{Binding OpenFolderCommand}"
-                    Grid.Row="3" Grid.Column="1"
+                    Grid.Row="2" Grid.Column="1"
                     Margin="2"
                     AutomationProperties.AutomationId="OpenFolderButton"/>
             <Button Content="Clear"
                     Command="{Binding ClearCommand}"
-                    Grid.Row="4" Grid.Column="1"
+                    Grid.Row="3" Grid.Column="1"
                     Margin="2"
                     AutomationProperties.AutomationId="ClearButton"/>
+
+            <TextBlock Text="Image type"
+                       Grid.Row="5" Grid.Column="0"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding AvailableBytesPerPixel}"
+                      SelectedIndex="0"
+                      Grid.Row="5" Grid.Column="1"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      AutomationProperties.AutomationId="ImageType"/>
+            <Button Content="Save generated image"
+                    Command="{Binding SaveGeneratedImageCommand}"
+                    Grid.Row="6" Grid.Column="1"
+                    Margin="2"
+                    AutomationProperties.AutomationId="SaveGeneratedImageButton"/>
+
             <Button Content="Test0"
                     Command="{Binding Test0Command}"
-                    Grid.Row="6" Grid.Column="1"
+                    Grid.Row="8" Grid.Column="1"
                     Margin="2"
                     AutomationProperties.AutomationId="Test0Button"/>
             <Button Content="Test1"
                     Command="{Binding Test1Command}"
-                    Grid.Row="7" Grid.Column="1"
+                    Grid.Row="9" Grid.Column="1"
                     Margin="2"
                     AutomationProperties.AutomationId="Test1Button"/>
         </Grid>
