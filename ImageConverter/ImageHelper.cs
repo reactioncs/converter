@@ -162,28 +162,20 @@ namespace ImageConverter
 
         public static byte[] ReadPngFile(string fileName, out int width, out int height, out int bytesPerPixel)
         {
-            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-            using (var image = (Bitmap)Image.FromStream(fs))
+            using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
-                width = image.Width;
-                height = image.Height;
-                bytesPerPixel = 1;
+                var decoder = new PngBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                var bitmap = decoder.Frames[0];
 
-                int size = width * height;
-                byte[] buffer = new byte[size];
-                byte[] bufferRGB = new byte[size * 4];
-                System.Drawing.Imaging.BitmapData data = image.LockBits(
-                    new Rectangle(Point.Empty, image.Size),
-                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                    image.PixelFormat
-                );
-                System.Runtime.InteropServices.Marshal.Copy(data.Scan0, bufferRGB, 0, size * 4);
+                width = bitmap.PixelWidth;
+                height = bitmap.PixelHeight;
+                bytesPerPixel = (bitmap.Format.BitsPerPixel + 7) / 8;
 
-                for (int i = 0; i < size; i++)
-                {
-                    buffer[i] = bufferRGB[i * 4];
-                }
-                return buffer;
+                var pixels = new byte[height * width * bytesPerPixel];
+
+                bitmap.CopyPixels(pixels, width * bytesPerPixel, 0);
+
+                return pixels;
             }
         }
 
