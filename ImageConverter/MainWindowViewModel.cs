@@ -1,47 +1,37 @@
-﻿using ImageConverter.Core;
-using CommunityToolkit.Mvvm;
-using ImageConverter.Model;
+﻿using ImageConverter.Model;
 using System;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ImageConverter
 {
-    public class MainWindowViewModel : ObservableObject
+    public partial class MainWindowViewModel : ObservableObject
     {
-        private int mQuality = 101;
-        public int Quality
-        {
-            get => mQuality;
-            set
-            {
-                mQuality = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
+        private int quality = 101;
+        [ObservableProperty]
+        private string selectedBytesPerPixel = "8-bits per pixel";
         public List<string> AvailableBytesPerPixel { get; set; } = new() { "8-bits per pixel", "16-bits per pixel" };
-
-        private string mSelectedBytesPerPixel = "8-bits per pixel";
-        public string SelectedBytesPerPixel
-        {
-            get => mSelectedBytesPerPixel;
-            set
-            {
-                mSelectedBytesPerPixel = value;
-                OnPropertyChanged();
-            }
-        }
-
         public ObservableCollection<LogItem> LogItems { get; set; } = new ();
 
-        public RelayCommand OpenFolderCommand { get; set; }
-        public RelayCommand ClearCommand { get; set; }
-        public RelayCommand SaveGeneratedImageCommand { get; set; }
-        public RelayCommand Test0Command { get; set; }
-        public RelayCommand Test1Command { get; set; }
+        [RelayCommand]
+        public void Test0() => Task.Run(() => { AddMessage("Test0"); });
+        [RelayCommand]
+        public void Test1() => Task.Run(() => { AddMessage("Test1"); });
+        [RelayCommand]
+        public void SaveGeneratedImage() => Task.Run(() => { SaveGenerateImage(); });
+        [RelayCommand]
+        public void OpenFolder()
+        {
+            string fileName = FileOperationInstance.OpenImageFileDialog() ?? "null";
+            AddMessage(fileName);
+        }
+        [RelayCommand]
+        public void Clear() => LogItems.Clear();
 
         public DateTime AddMessage(string message, DateTime? timePrevious = null)
         {
@@ -57,22 +47,6 @@ namespace ImageConverter
         }
 
         public FileOperation FileOperationInstance { get; set; } = FileOperation.Instance;
-
-        public MainWindowViewModel()
-        {
-            Test0Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test0"); }));
-            Test1Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test1"); }));
-
-            SaveGeneratedImageCommand = new RelayCommand(o => Task.Run(() => { SaveGenerateImage(); }));
-
-            OpenFolderCommand = new RelayCommand(o =>
-            {
-                string fileName = FileOperationInstance.OpenImageFileDialog() ?? "null";
-                AddMessage(fileName);
-            });
-
-            ClearCommand = new RelayCommand(o => LogItems.Clear());
-        }
 
         private void SaveGenerateImage()
         {
