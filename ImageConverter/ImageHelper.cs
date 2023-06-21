@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Drawing;
 using LibHeifSharp;
 using ThirdParty.LibWebp;
+using System;
 
 namespace ImageConverter
 {

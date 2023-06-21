@@ -39,6 +39,11 @@
                   Margin="5"
                   Foreground="Black"
                   AutomationProperties.AutomationId="LogGrid">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="AutomationProperties.AutomationId" Value="LotItem"/>
+                </Style>
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Time" Width="110" DisplayMemberBinding="{Binding Time, StringFormat='HH:mm:ss.fff'}"/>
