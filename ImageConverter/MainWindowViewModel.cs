@@ -14,7 +14,7 @@ namespace ImageConverter
         private int mQuality = 101;
         public int Quality
         {
-            get { return mQuality; }
+            get => mQuality;
             set
             {
                 mQuality = value;
@@ -23,6 +23,17 @@ namespace ImageConverter
         }
 
         public List<string> AvailableBytesPerPixel { get; set; } = new() { "8-bits per pixel", "16-bits per pixel" };
+
+        private string mSelectedBytesPerPixel;
+        public string SelectedBytesPerPixel
+        {
+            get => mSelectedBytesPerPixel;
+            set
+            {
+                mSelectedBytesPerPixel = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ObservableCollection<LogItem> LogItems { get; set; }
 
@@ -52,7 +63,7 @@ namespace ImageConverter
             Test0Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test0"); }));
             Test1Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test1"); }));
 
-            SaveGeneratedImageCommand = new RelayCommand(o => Task.Run(() => { SaveGenerateImageAsWebp(); }));
+            SaveGeneratedImageCommand = new RelayCommand(o => Task.Run(() => { SaveGenerateImage(); }));
 
             OpenFolderCommand = new RelayCommand(o =>
             {
@@ -63,16 +74,30 @@ namespace ImageConverter
             ClearCommand = new RelayCommand(o => LogItems.Clear());
         }
 
-        private void SaveGenerateImageAsWebp()
+        private void SaveGenerateImage()
         {
-            var b = ImageGenerator.GenerateTestImage_8();
-            var b_ = ImageHelper.ConvertToWebpFormat(b, 1024, 1024, 1, 101);
+            byte[] img_byte;
 
-            string? path = FileOperation.SavingImageFileDialog(ImageFormats.Wepb, title: "Save GenerateImage As Webp");
+            switch(SelectedBytesPerPixel)
+            {
+                case "8-bits per pixel":
+                    var img_8 = ImageGenerator.GenerateTestImage_8();
+                    img_byte = ImageHelper.ConvertToPngFormat(img_8, 1024, 1024, 1);
+                    break;
+                case "16-bits per pixel":
+                    var img_16 = ImageGenerator.GenerateTestImage_16();
+                    img_byte = ImageHelper.ConvertToPngFormat(img_16, 1024, 1024, 2);
+                    break;
+                default:
+                    AddMessage("Please select a format.");
+                    return;
+            }
+            
+            string? path = FileOperation.SavingImageFileDialog(ImageFormats.Png, title: "Save GenerateImage");
             if (path == null)
                 return;
 
-            File.WriteAllBytes(path, b_);
+            File.WriteAllBytes(path, img_byte);
             AddMessage(path);
         }
     }
