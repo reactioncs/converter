@@ -24,7 +24,7 @@ namespace ImageConverter
 
         public List<string> AvailableBytesPerPixel { get; set; } = new() { "8-bits per pixel", "16-bits per pixel" };
 
-        private string mSelectedBytesPerPixel;
+        private string mSelectedBytesPerPixel = "8-bits per pixel";
         public string SelectedBytesPerPixel
         {
             get => mSelectedBytesPerPixel;
@@ -35,7 +35,7 @@ namespace ImageConverter
             }
         }
 
-        public ObservableCollection<LogItem> LogItems { get; set; }
+        public ObservableCollection<LogItem> LogItems { get; set; } = new ();
 
         public RelayCommand OpenFolderCommand { get; set; }
         public RelayCommand ClearCommand { get; set; }
@@ -56,10 +56,10 @@ namespace ImageConverter
             return log.Time;
         }
 
+        public FileOperation FileOperationInstance { get; set; } = FileOperation.Instance;
+
         public MainWindowViewModel()
         {
-            LogItems = new ObservableCollection<LogItem>();
-
             Test0Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test0"); }));
             Test1Command = new RelayCommand(o => Task.Run(() => { AddMessage("Test1"); }));
 
@@ -67,7 +67,7 @@ namespace ImageConverter
 
             OpenFolderCommand = new RelayCommand(o =>
             {
-                string fileName = FileOperation.OpenImageFileDialog() ?? "null";
+                string fileName = FileOperationInstance.OpenImageFileDialog() ?? "null";
                 AddMessage(fileName);
             });
 
@@ -93,7 +93,7 @@ namespace ImageConverter
                     return;
             }
             
-            string? path = FileOperation.SavingImageFileDialog(ImageFormats.Png, title: "Save GenerateImage");
+            string? path = FileOperationInstance.SavingImageFileDialog(ImageFormats.Png, title: "Save GenerateImage");
             if (path == null)
                 return;
 

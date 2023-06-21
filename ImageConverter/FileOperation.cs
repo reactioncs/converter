@@ -7,23 +7,43 @@ namespace ImageConverter
 {
     public class FileOperation
     {
-        public static string? OpenImageFileDialog(string title = "Chosing Image", string initialDirectory = "C:\\")
+        private FileOperation() { }
+
+        private static FileOperation? mInstance = null;
+        public static FileOperation Instance
+        {
+            get
+            {
+                if (mInstance == null)
+                {
+                    mInstance = new FileOperation();
+                }
+                return mInstance;
+            }
+        }
+
+        public string InitialDirectory { get; set; } = "C:\\";
+
+        public string? OpenImageFileDialog(string title = "Chosing Image")
         {
             OpenFileDialog fileDialog = new()
             {
-                InitialDirectory = initialDirectory,
+                InitialDirectory = InitialDirectory,
                 Filter = "Png File|*.png|Wepb File|*.webp|Avif File|*.avif|Heif File|*.heif|All files|*.*",
                 FilterIndex = 5,
                 Title = title
             };
 
             if (fileDialog.ShowDialog() == true)
+            {
+                InitialDirectory = fileDialog.FileName;
                 return fileDialog.FileName;
+            }
 
             return null;
         }
 
-        public static string? SavingImageFileDialog(ImageFormats f, string title = "Saving Image", string initialDirectory = "C:\\")
+        public string? SavingImageFileDialog(ImageFormats f, string title = "Saving Image")
         {
             string filter = "";
             filter += f.HasFlag(ImageFormats.Png) ? "Png File|*.png|" : "";
@@ -33,14 +53,17 @@ namespace ImageConverter
 
             SaveFileDialog fileDialog = new()
             {
-                InitialDirectory = initialDirectory,
+                InitialDirectory = InitialDirectory,
                 // get rid of the last '|'
                 Filter = filter[..^1],
                 Title = title
             };
 
             if (fileDialog.ShowDialog() == true)
+            {
+                InitialDirectory = fileDialog.FileName;
                 return fileDialog.FileName;
+            }
 
             return null;
         }
