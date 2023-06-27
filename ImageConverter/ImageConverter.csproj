@@ -23,7 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Logging\Services.Logging.csproj" />
+    <ProjectReference Include="..\Services.Logging\Services.Logging.csproj" />
     <ProjectReference Include="..\ThirdParty.LibWebp\ThirdParty.LibWebp.csproj" />
+    <ProjectReference Include="..\UI.Logging\UI.Logging.csproj" />
   </ItemGroup>
 
   <Target Name="CopyDLLs" AfterTargets="Build">

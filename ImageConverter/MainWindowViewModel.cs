@@ -1,11 +1,11 @@
-﻿using ImageConverter.Model;
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Services.Logging;
 
 namespace ImageConverter
 {
@@ -23,7 +23,7 @@ namespace ImageConverter
         [RelayCommand]
         public void Test1() => Task.Run(() => { AddMessage("Test1"); });
         [RelayCommand]
-        public void SaveGeneratedImage() => Task.Run(() => { SaveGenerateImage(); });
+        public async Task SaveGeneratedImageAsync() => await Task.Run(() => { SaveGenerateImage(); });
         [RelayCommand]
         public void OpenFolder()
         {
@@ -33,17 +33,11 @@ namespace ImageConverter
         [RelayCommand]
         public void Clear() => LogItems.Clear();
 
-        public DateTime AddMessage(string message, DateTime? timePrevious = null)
+        public void AddMessage(string message)
         {
-            LogItem log = new()
-            {
-                Message = message,
-                TimePrevious = timePrevious ?? DateTime.Now
-            };
+            LogItem log = new(DateTime.Now, "MainView", message);
 
             System.Windows.Application.Current.Dispatcher.Invoke(() => LogItems.Add(log));
-
-            return log.Time;
         }
 
         public FileOperation FileOperationInstance { get; set; } = FileOperation.Instance;
