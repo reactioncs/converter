@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:log="clr-namespace:UI.Logging;assembly=UI.Logging"
         Title="Image Converter"
-        Width="800" Height="750"
+        Width="800" Height="800"
         ResizeMode="NoResize"
         mc:Ignorable="d">
     <Window.DataContext>

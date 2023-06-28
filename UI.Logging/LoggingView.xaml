@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:UI.Logging"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              d:DataContext="{d:DesignInstance Type=local:LoggingViewModel}"
-             d:DesignHeight="220" d:DesignWidth="800"
+             d:DesignHeight="300" d:DesignWidth="800"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -16,15 +16,49 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+
     <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Remove All"
+                    Command="{Binding RemoveAllCommand}"
+                    Height="30"
+                    Margin="0,0,5,0"/>
+            <Button Content="Remove Selected" Height="30" Margin="0,0,5,0"/>
+            <TextBox Text="Test Message"
+                     Width="200" Height="30"
+                     Margin="0,0,5,0"
+                     HorizontalContentAlignment="Center">
+                <TextBox.Resources>
+                    <Style BasedOn="{StaticResource TextBoxExtendBaseStyle}" TargetType="{x:Type TextBox}">
+                        <Setter Property="Foreground" Value="DarkBlue"/>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
+        </StackPanel>
+
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Content="Add Random"
+                    Command="{Binding AddRandomCommand}"
+                    Height="30"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Right"/>
+        </StackPanel>
+
         <DataGrid ItemsSource="{Binding LogItemCollection}"
+                  Grid.Row="1"
                   AutoGenerateColumns="False"
-                  FontSize="12"
-                  IsReadOnly="True"
-                  ColumnHeaderHeight="20"
-                  RowHeight="20">
+                  CanUserSortColumns="False"
+                  IsReadOnly="True" RowHeaderWidth="40"
+                  RowHeight="30"
+                  Style="{StaticResource DataGrid.Small}">
             <DataGrid.Resources>
-                <Style TargetType="DataGridCell">
+                <Style BasedOn="{StaticResource DataGridCellStyle.Small}" TargetType="{x:Type DataGridCell}">
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="ToolTip">
                         <Setter.Value>
@@ -37,10 +71,15 @@
             </DataGrid.Resources>
             <DataGrid.ContextMenu>
                 <ContextMenu FontSize="12">
-                    <MenuItem Header="Clear All" Command="{Binding ClearAllCommand}"/>
+                    <MenuItem Header="Remove All" Command="{Binding RemoveAllCommand}"/>
                     <MenuItem Header="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat='HH:mm:ss.fff'}" Width="100"/>
                 <DataGridTextColumn Header="From" Binding="{Binding From}" Width="150"/>
