@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,24 +10,22 @@ namespace UI.Logging
 {
     public partial class LoggingViewModel: ObservableObject
     {
-        public ObservableCollection<LogItem> LogItemCollection { get; set; } = new();
-
-        public IList<DataGridCellInfo>? SelectedLogs { get; set; } = null;
+        public LoggingService LoggingService { get; set; } = LoggingService.Instance;
 
         public LoggingViewModel()
         {
-            LogItemCollection.CollectionChanged += (o, e) => RemoveAllCommand.NotifyCanExecuteChanged();
+            LoggingService.LogItemCollection.CollectionChanged += (o, e) => RemoveAllCommand.NotifyCanExecuteChanged();
 
-            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", GetRandomMessage()));
-            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", GetRandomMessage()));
+            LoggingService.AddLog("LoggingViewModel", GetRandomMessage());
+            LoggingService.AddLog("LoggingViewModel", GetRandomMessage());
         }
 
         [RelayCommand(CanExecute = nameof(IsRemoveAllAllCanExecute))]
         private void RemoveAll()
         {
-            LogItemCollection.Clear();
+            LoggingService.ClearLog();
         }
-        private bool IsRemoveAllAllCanExecute() => LogItemCollection.Count > 0;
+        private bool IsRemoveAllAllCanExecute() => LoggingService.LogCount > 0;
 
         [RelayCommand]
         private void RemoveSelected(IList selectedLogs)
@@ -42,7 +39,7 @@ namespace UI.Logging
 
             foreach (LogItem log in logsToDelete)
             {
-                LogItemCollection.Remove(log);
+                LoggingService.RemoveLog(log);
             }
         }
 
@@ -72,7 +69,7 @@ namespace UI.Logging
         [RelayCommand]
         private void AddRandom()
         {
-            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", GetRandomMessage()));
+            LoggingService.AddLog("LoggingViewModel", GetRandomMessage());
         }
     }
 }

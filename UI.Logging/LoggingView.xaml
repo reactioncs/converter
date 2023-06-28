@@ -53,7 +53,7 @@
                     HorizontalAlignment="Right"/>
         </StackPanel>
 
-        <DataGrid ItemsSource="{Binding LogItemCollection}"
+        <DataGrid ItemsSource="{Binding LoggingService.LogItemCollection}"
                   x:Name="LogDataGrid"
                   Grid.Row="1"
                   AutoGenerateColumns="False"
