@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logging\Services.Logging.csproj" />
     <ProjectReference Include="..\Services.Logging\Services.Logging.csproj" />
   </ItemGroup>
 

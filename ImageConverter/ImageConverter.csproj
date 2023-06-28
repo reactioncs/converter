@@ -8,13 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ThirdParty.LibWebp\**" />
-    <EmbeddedResource Remove="ThirdParty.LibWebp\**" />
-    <None Remove="ThirdParty.LibWebp\**" />
-    <Page Remove="ThirdParty.LibWebp\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2" />
     <PackageReference Include="LibHeifSharp" Version="3.1" />
     <PackageReference Include="OpenCvSharp4" Version="4.7" />
@@ -23,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logging\Services.Logging.csproj" />
     <ProjectReference Include="..\Services.Logging\Services.Logging.csproj" />
     <ProjectReference Include="..\ThirdParty.LibWebp\ThirdParty.LibWebp.csproj" />
     <ProjectReference Include="..\UI.Logging\UI.Logging.csproj" />
