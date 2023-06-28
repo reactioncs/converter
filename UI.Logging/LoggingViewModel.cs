@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Services.Logging;
@@ -11,12 +13,14 @@ namespace UI.Logging
     {
         public ObservableCollection<LogItem> LogItemCollection { get; set; } = new();
 
+        public IList<DataGridCellInfo>? SelectedLogs { get; set; } = null;
+
         public LoggingViewModel()
         {
             LogItemCollection.CollectionChanged += (o, e) => RemoveAllCommand.NotifyCanExecuteChanged();
 
-            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", "Platform and Runtime Independent"));
-            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", "Simple to pick-up and use\n Reference Implementation"));
+            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", GetRandomMessage()));
+            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", GetRandomMessage()));
         }
 
         [RelayCommand(CanExecute = nameof(IsRemoveAllAllCanExecute))]
@@ -27,15 +31,25 @@ namespace UI.Logging
         private bool IsRemoveAllAllCanExecute() => LogItemCollection.Count > 0;
 
         [RelayCommand]
-        private void RemoveSelected()
+        private void RemoveSelected(IList selectedLogs)
         {
-            throw new NotImplementedException();
+            List<LogItem> logsToDelete = new();
+
+            foreach (object log in selectedLogs)
+            {
+                logsToDelete.Add((LogItem)log);
+            }
+
+            foreach (LogItem log in logsToDelete)
+            {
+                LogItemCollection.Remove(log);
+            }
         }
 
         private readonly List<string> randomMessages = new()
         {
             "The Car Turned The Corner.",
-            "Did You Know That, Along With Gorgeous Architecture, It's Home To The Largest Tamale ?",
+            "Did You Know That, Along With Gorgeous Architecture,\n It's Home To The Largest Tamale ?",
             "Nice To Meet You Too.+I Love Learning!",
             "The Cat Stretched.+I Ate Dinner.",
             "I'm Coming Right Now.",
@@ -53,11 +67,12 @@ namespace UI.Logging
             "I'm Confident That I'll Win The Tennis Match.",
         };
 
+        public string GetRandomMessage() => randomMessages[new Random().Next() % randomMessages.Count];
+
         [RelayCommand]
         private void AddRandom()
         {
-            string randomMessage = randomMessages[new Random().Next() % randomMessages.Count];
-            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", randomMessage));
+            LogItemCollection.Add(new(DateTime.Now, "LoggingViewModel", GetRandomMessage()));
         }
     }
 }

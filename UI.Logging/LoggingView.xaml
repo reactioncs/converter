@@ -18,18 +18,21 @@
     </UserControl.Resources>
 
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal">
+            <Button Content="Remove Selected"
+                    Command="{Binding RemoveSelectedCommand}"
+                    Height="30"
+                    Margin="0,0,5,0"
+                    CommandParameter="{Binding ElementName=LogDataGrid, Path=SelectedItems}"/>
             <Button Content="Remove All"
                     Command="{Binding RemoveAllCommand}"
                     Height="30"
                     Margin="0,0,5,0"/>
-            <Button Content="Remove Selected" Height="30" Margin="0,0,5,0"/>
             <TextBox Text="Test Message"
                      Width="200" Height="30"
                      Margin="0,0,5,0"
@@ -51,6 +54,7 @@
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding LogItemCollection}"
+                  x:Name="LogDataGrid"
                   Grid.Row="1"
                   AutoGenerateColumns="False"
                   CanUserSortColumns="False"
@@ -59,7 +63,6 @@
                   Style="{StaticResource DataGrid.Small}">
             <DataGrid.Resources>
                 <Style BasedOn="{StaticResource DataGridCellStyle.Small}" TargetType="{x:Type DataGridCell}">
-                    <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="ToolTip">
                         <Setter.Value>
                             <StackPanel Orientation="Horizontal">
@@ -72,7 +75,6 @@
             <DataGrid.ContextMenu>
                 <ContextMenu FontSize="12">
                     <MenuItem Header="Remove All" Command="{Binding RemoveAllCommand}"/>
-                    <MenuItem Header="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.RowHeaderTemplate>

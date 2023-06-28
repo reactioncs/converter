@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:log="clr-namespace:UI.Logging;assembly=UI.Logging"
         Title="Image Converter"
-        Width="800" Height="800"
+        Width="1000" Height="1000"
         ResizeMode="NoResize"
         mc:Ignorable="d">
     <Window.DataContext>
@@ -26,8 +26,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="520"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="300"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="Image Converter"
