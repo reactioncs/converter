@@ -37,8 +37,8 @@
             </DataGrid.Resources>
             <DataGrid.ContextMenu>
                 <ContextMenu FontSize="12">
-                    <MenuItem Header="Clear All"/>
-                    <MenuItem Header="Remove Selected"/>
+                    <MenuItem Header="Clear All" Command="{Binding ClearAllCommand}"/>
+                    <MenuItem Header="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
