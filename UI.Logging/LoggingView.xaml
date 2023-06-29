@@ -43,7 +43,7 @@
                     HorizontalAlignment="Right"/>
         </StackPanel>
 
-        <DataGrid ItemsSource="{Binding LogViewItems}"
+        <DataGrid ItemsSource="{Binding CollectionView}"
                   x:Name="LogDataGrid"
                   Grid.Row="1"
                   AutoGenerateColumns="False"
@@ -55,8 +55,9 @@
                 <Style BasedOn="{StaticResource DataGridCellStyle.Small}" TargetType="{x:Type DataGridCell}">
                     <Setter Property="ToolTip">
                         <Setter.Value>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Message}"/>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss.fff'}"/>
+                                <TextBlock Text="{Binding Message}" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Setter.Value>
                     </Setter>
@@ -75,7 +76,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat='HH:mm:ss.fff'}" Width="100"/>
                 <DataGridTextColumn Header="From" Binding="{Binding From}" Width="150"/>
-                <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*" FontWeight="SemiBold"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

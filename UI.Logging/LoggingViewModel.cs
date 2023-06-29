@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Services.Logging;
@@ -12,20 +13,23 @@ namespace UI.Logging
     {
         public LoggingService Log { get; set; } = LoggingService.Instance;
 
-        public ObservableCollection<LogItem> LogViewItems { get; set; } = new();
+        [ObservableProperty]
+        public ICollectionView collectionView;
 
         public LoggingViewModel()
         {
             Log.OnLogItemCollectionChange += (o, e) =>
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                    LogViewItems.Clear();
-                    foreach (LogItem log in Log.LogItemCollection)
-                        LogViewItems.Add(log);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CollectionView?.Refresh();
 
                     RemoveAllCommand.NotifyCanExecuteChanged();
                 });
             };
+
+            CollectionView = CollectionViewSource.GetDefaultView(Log.LogItemCollection);
+            CollectionView.SortDescriptions.Add(new SortDescription("Timestamp", ListSortDirection.Descending));
 
             Log.AddLog("LoggingView", GetRandomMessage());
             Log.AddLog("LoggingView", GetRandomMessage());
@@ -52,7 +56,7 @@ namespace UI.Logging
             {
                 Log.RemoveLog(log);
             }
-        }
+        } 
 
         private readonly List<string> randomMessages = new()
         {
