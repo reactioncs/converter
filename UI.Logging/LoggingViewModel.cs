@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Windows.Controls;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Services.Logging;
@@ -10,22 +10,33 @@ namespace UI.Logging
 {
     public partial class LoggingViewModel: ObservableObject
     {
-        public LoggingService LoggingService { get; set; } = LoggingService.Instance;
+        public LoggingService Log { get; set; } = LoggingService.Instance;
+
+        public ObservableCollection<LogItem> LogViewItems { get; set; } = new();
 
         public LoggingViewModel()
         {
-            LoggingService.LogItemCollection.CollectionChanged += (o, e) => RemoveAllCommand.NotifyCanExecuteChanged();
+            Log.OnLogItemCollectionChange += (o, e) =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => {
+                    LogViewItems.Clear();
+                    foreach (LogItem log in Log.LogItemCollection)
+                        LogViewItems.Add(log);
 
-            LoggingService.AddLog("LoggingViewModel", GetRandomMessage());
-            LoggingService.AddLog("LoggingViewModel", GetRandomMessage());
+                    RemoveAllCommand.NotifyCanExecuteChanged();
+                });
+            };
+
+            Log.AddLog("LoggingView", GetRandomMessage());
+            Log.AddLog("LoggingView", GetRandomMessage());
         }
 
         [RelayCommand(CanExecute = nameof(IsRemoveAllAllCanExecute))]
         private void RemoveAll()
         {
-            LoggingService.ClearLog();
+            Log.ClearLog();
         }
-        private bool IsRemoveAllAllCanExecute() => LoggingService.LogCount > 0;
+        private bool IsRemoveAllAllCanExecute() => Log.LogCount > 0;
 
         [RelayCommand]
         private void RemoveSelected(IList selectedLogs)
@@ -39,7 +50,7 @@ namespace UI.Logging
 
             foreach (LogItem log in logsToDelete)
             {
-                LoggingService.RemoveLog(log);
+                Log.RemoveLog(log);
             }
         }
 
@@ -67,9 +78,6 @@ namespace UI.Logging
         public string GetRandomMessage() => randomMessages[new Random().Next() % randomMessages.Count];
 
         [RelayCommand]
-        private void AddRandom()
-        {
-            LoggingService.AddLog("LoggingViewModel", GetRandomMessage());
-        }
+        private void AddRandom() => Log.AddLog("LoggingView", GetRandomMessage());
     }
 }

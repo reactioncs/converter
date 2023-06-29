@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.ObjectModel;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,28 +14,20 @@ namespace ImageConverter
         [ObservableProperty]
         private string selectedBytesPerPixel = "8-bits per pixel";
         public List<string> AvailableBytesPerPixel { get; set; } = new() { "8-bits per pixel", "16-bits per pixel" };
-        public ObservableCollection<LogItem> LogItems { get; set; } = new ();
+
+        public LoggingService Log { get; set; } = LoggingService.Instance;
 
         [RelayCommand]
-        public void Test0() => Task.Run(() => { AddMessage("Test0"); });
+        public void Test0() => Task.Run(() => { Log.AddLog("MainWindowView", "Test0"); });
         [RelayCommand]
-        public void Test1() => Task.Run(() => { AddMessage("Test1"); });
+        public void Test1() => Task.Run(() => { Log.AddLog("MainWindowView", "Test1"); });
         [RelayCommand]
         public async Task SaveGeneratedImageAsync() => await Task.Run(() => { SaveGenerateImage(); });
         [RelayCommand]
         public void OpenFolder()
         {
             string fileName = FileOperationInstance.OpenImageFileDialog() ?? "null";
-            AddMessage(fileName);
-        }
-        [RelayCommand]
-        public void Clear() => LogItems.Clear();
-
-        public void AddMessage(string message)
-        {
-            LogItem log = new(DateTime.Now, "MainView", message);
-
-            System.Windows.Application.Current.Dispatcher.Invoke(() => LogItems.Add(log));
+            Log.AddLog("MainWindowView", fileName);
         }
 
         public FileOperation FileOperationInstance { get; set; } = FileOperation.Instance;
@@ -57,7 +47,7 @@ namespace ImageConverter
                     img_byte = ImageHelper.ConvertToPngFormat(img_16, 1024, 1024, 2);
                     break;
                 default:
-                    AddMessage("Please select a format.");
+                    Log.AddLog("MainWindowView", "Please select a format.");
                     return;
             }
             
@@ -66,7 +56,7 @@ namespace ImageConverter
                 return;
 
             File.WriteAllBytes(path, img_byte);
-            AddMessage(path);
+            Log.AddLog("MainWindowView", path);
         }
     }
 }

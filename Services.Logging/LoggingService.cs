@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.ComponentModel;
 
 namespace Services.Logging
 {
@@ -16,24 +16,34 @@ namespace Services.Logging
             }
         }
 
-        public ObservableCollection<LogItem> LogItemCollection { get; set; } = new();
+        public List<LogItem> LogItemCollection { get; set; } = new();
+        public event CollectionChangeEventHandler? OnLogItemCollectionChange;
 
         public int LogCount
         {
             get => LogItemCollection.Count;
         }
-        
+
         public void AddLog(string from, string message) => AddLog(new(DateTime.Now, from, message));
 
-        public void AddLog(LogItem log) => LogItemCollection.Add(log);
+        public void AddLog(LogItem log)
+        {
+            LogItemCollection.Add(log);
+            OnLogItemCollectionChange?.Invoke(this, new(CollectionChangeAction.Add, null));
+        }
 
         public void RemoveLog(LogItem log)
         {
             if (LogItemCollection.Contains(log))
                 LogItemCollection.Remove(log);
+            OnLogItemCollectionChange?.Invoke(this, new(CollectionChangeAction.Remove, null));
         }
 
-        public void ClearLog() => LogItemCollection.Clear();
+        public void ClearLog()
+        {
+            LogItemCollection.Clear();
+            OnLogItemCollectionChange?.Invoke(this, new(CollectionChangeAction.Refresh, null));
+        }
     }
 
     public record LogItem(DateTime Timestamp, string From, string Message);
