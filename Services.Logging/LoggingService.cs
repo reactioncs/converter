@@ -19,11 +19,6 @@ namespace Services.Logging
         public List<LogItem> LogItemCollection { get; set; } = new();
         public event CollectionChangeEventHandler? OnLogItemCollectionChange;
 
-        public int LogCount
-        {
-            get => LogItemCollection.Count;
-        }
-
         public void AddLog(string from, string message) => AddLog(new(DateTime.Now, from, message));
 
         public void AddLog(LogItem log)

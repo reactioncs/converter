@@ -23,7 +23,6 @@ namespace UI.Logging
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     CollectionView?.Refresh();
-
                     RemoveAllCommand.NotifyCanExecuteChanged();
                 });
             };
@@ -36,11 +35,8 @@ namespace UI.Logging
         }
 
         [RelayCommand(CanExecute = nameof(IsRemoveAllAllCanExecute))]
-        private void RemoveAll()
-        {
-            Log.ClearLog();
-        }
-        private bool IsRemoveAllAllCanExecute() => Log.LogCount > 0;
+        private void RemoveAll() => Log.ClearLog();
+        private bool IsRemoveAllAllCanExecute() => !CollectionView.IsEmpty;
 
         [RelayCommand]
         private void RemoveSelected(IList selectedLogs)
