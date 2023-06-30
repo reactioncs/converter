@@ -23,25 +23,35 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal">
-            <Button Content="Remove Selected"
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Remove Selected"
                     Command="{Binding RemoveSelectedCommand}"
                     Height="30"
                     Margin="0,0,5,0"
                     CommandParameter="{Binding ElementName=LogDataGrid, Path=SelectedItems}"/>
-            <Button Content="Remove All"
+                <Button Content="Remove All"
                     Command="{Binding RemoveAllCommand}"
                     Height="30"
                     Margin="0,0,5,0"/>
-        </StackPanel>
+            </StackPanel>
 
-        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button Content="Add Random"
+            <hc:TextBox Grid.Column="1" Height="30" hc:InfoElement.Placeholder="Type Something"/>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                <Button Content="Add Random"
                     Command="{Binding AddRandomCommand}"
                     Height="30"
                     Margin="5,0,0,0"
                     HorizontalAlignment="Right"/>
-        </StackPanel>
+            </StackPanel>
+        </Grid>
 
         <DataGrid ItemsSource="{Binding CollectionView}"
                   x:Name="LogDataGrid"

@@ -54,7 +54,7 @@ namespace UI.Logging
             }
         } 
 
-        private readonly List<string> randomMessages = new()
+        private readonly string[] randomMessages = new []
         {
             "The Car Turned The Corner.",
             "Did You Know That, Along With Gorgeous Architecture,\n It's Home To The Largest Tamale ?",
@@ -75,7 +75,7 @@ namespace UI.Logging
             "I'm Confident That I'll Win The Tennis Match.",
         };
 
-        public string GetRandomMessage() => randomMessages[new Random().Next() % randomMessages.Count];
+        public string GetRandomMessage() => randomMessages[new Random().Next() % randomMessages.Length];
 
         [RelayCommand]
         private void AddRandom() => Log.AddLog("LoggingView", GetRandomMessage());
