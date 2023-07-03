@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Services.Logging;
+using Logging;
 
 namespace ImageConverter
 {
@@ -15,7 +15,7 @@ namespace ImageConverter
         private string selectedBytesPerPixel = "8-bits per pixel";
         public List<string> AvailableBytesPerPixel { get; set; } = new() { "8-bits per pixel", "16-bits per pixel" };
 
-        public LoggingService Log { get; set; } = LoggingService.Instance;
+        public LoggingModel Log { get; set; } = LoggingModel.Instance;
 
         [RelayCommand]
         public void Test0() => Task.Run(() => { Log.AddLog("MainWindowView", "Test0"); });

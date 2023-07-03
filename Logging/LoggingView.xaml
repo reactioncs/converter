@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="Logging.LoggingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:local="clr-namespace:Logging"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DataContext="{d:DesignInstance Type=local:LoggingViewModel}"
+             d:DesignHeight="300" d:DesignWidth="800"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Remove Selected"
+                    Command="{Binding RemoveSelectedCommand}"
+                    Height="30"
+                    Margin="0,0,5,0"
+                    CommandParameter="{Binding ElementName=LogDataGrid, Path=SelectedItems}"/>
+                <Button Content="Remove All"
+                    Command="{Binding RemoveAllCommand}"
+                    Height="30"
+                    Margin="0,0,5,0"/>
+            </StackPanel>
+
+            <hc:TextBox Grid.Column="1" Height="30" hc:InfoElement.Placeholder="Type Something"/>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                <Button Content="Add Random"
+                    Command="{Binding AddRandomCommand}"
+                    Height="30"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+
+        <DataGrid ItemsSource="{Binding CollectionView}"
+                  x:Name="LogDataGrid"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  CanUserSortColumns="False"
+                  IsReadOnly="True" RowHeaderWidth="40"
+                  RowHeight="30"
+                  Style="{StaticResource DataGrid.Small}">
+            <DataGrid.Resources>
+                <Style BasedOn="{StaticResource DataGridCellStyle.Small}" TargetType="{x:Type DataGridCell}">
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss.fff'}"/>
+                                <TextBlock Text="{Binding Message}" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.ContextMenu>
+                <ContextMenu FontSize="12">
+                    <MenuItem Header="Remove All" Command="{Binding RemoveAllCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat='HH:mm:ss.fff'}" Width="100"/>
+                <DataGridTextColumn Header="From" Binding="{Binding From}" Width="150"/>
+                <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*" FontWeight="SemiBold"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
