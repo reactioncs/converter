@@ -28,7 +28,7 @@ namespace UI.Logging
             };
 
             CollectionView = CollectionViewSource.GetDefaultView(Log.LogItemCollection);
-            CollectionView.SortDescriptions.Add(new SortDescription("Timestamp", ListSortDirection.Descending));
+            CollectionView.SortDescriptions.Add(new SortDescription(nameof(LogItem.Timestamp), ListSortDirection.Descending));
 
             Log.AddLog("LoggingView", GetRandomMessage());
             Log.AddLog("LoggingView", GetRandomMessage());
